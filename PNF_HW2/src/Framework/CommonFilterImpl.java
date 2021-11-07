@@ -25,7 +25,7 @@ public abstract class CommonFilterImpl implements CommonFilter {
 		return out;
 	}
 	
-	abstract public boolean specificComputationForFilter() throws IOException;
+	abstract public void specificComputationForFilter() throws IOException;
 	// Implementation defined in Runnable interface for thread
 	public void run() {
 		try {

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright(c) 2021 All rights reserved by Jungho Kim in Myungji University.
  */
 package Framework;
@@ -25,7 +25,7 @@ public abstract class CommonFilterImpl implements CommonFilter {
 		return out;
 	}
 	
-	abstract public boolean specificComputationForFilter() throws IOException;
+	abstract public void specificComputationForFilter() throws IOException;
 	// Implementation defined in Runnable interface for thread
 	public void run() {
 		try {

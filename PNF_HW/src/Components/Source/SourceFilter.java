@@ -4,7 +4,6 @@
 package Components.Source;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
@@ -18,12 +17,12 @@ public class SourceFilter extends CommonFilterImpl{
     }
 
     @Override
-    public boolean specificComputationForFilter() throws IOException {
+    public void specificComputationForFilter() throws IOException {
         int byte_read;    
         BufferedInputStream br = new BufferedInputStream(new FileInputStream(sourceFile));
         while(true) {
             byte_read = br.read();//한 바이트씩 read
-            if (byte_read == -1) return true;
+            if (byte_read == -1) return;
             out.write(byte_read);
         }
     }

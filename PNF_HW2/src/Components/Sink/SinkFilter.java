@@ -15,7 +15,7 @@ public class SinkFilter extends CommonFilterImpl{
         this.sinkFile = outputFile;
     }
     @Override
-    public boolean specificComputationForFilter() throws IOException {
+    public void specificComputationForFilter() throws IOException {
         int byte_read;
         FileWriter fw = new FileWriter(this.sinkFile);
         while(true) {
@@ -23,7 +23,7 @@ public class SinkFilter extends CommonFilterImpl{
             if (byte_read == -1) {
             	 fw.close();
                  System.out.print( "::Filtering is finished; Output file is created." );  
-                 return true;
+                 return;
             }
 //            System.out.println((char)byte_read);
             fw.write((char)byte_read);
