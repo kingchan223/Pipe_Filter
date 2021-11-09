@@ -8,45 +8,61 @@ import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public abstract class CommonFilterImpl implements CommonFilter {
 
-	protected ArrayList<PipedInputStream> in = new ArrayList<>();
-	protected ArrayList<PipedOutputStream> out = new ArrayList<>();
-	public CommonFilterImpl() {
-		this.in.add(new PipedInputStream());
-		this.in.add(new PipedInputStream());
-		this.out.add(new PipedOutputStream());
-		this.out.add(new PipedOutputStream());
+	protected HashMap<String, PipedInputStream> ins = new HashMap<>();
+	protected HashMap<String, PipedOutputStream> outs = new HashMap<>();
+
+
+	public void addPipedInputStream(String key){
+		if(ins.get(key)==null)
+			ins.put(key, new PipedInputStream());
 	}
 
-	public void connectOutputTo(CommonFilter nextFilter) throws IOException {
-		this.out.get(0).connect(nextFilter.getIn());
-		this.out.get(1).connect(nextFilter.getIn2());
-	}
-	public void connectInputTo(CommonFilter previousFilter) throws IOException {
-		this.in.get(0).connect(previousFilter.getOut());
-		this.in.get(1).connect(previousFilter.getOut2());
+	public void addPipedOutputStream(String key){
+		if(outs.get(key)==null)
+			outs.put(key, new PipedOutputStream());
 	}
 
-	public PipedInputStream getIn() {
-		return this.in.get(0);
+	public void addPipedInputStream(String...keys){
+		for (String key : keys){
+			if(this.ins.get(key)==null)
+				this.ins.put(key, new PipedInputStream());
+		}
 	}
 
-	public PipedInputStream getIn2() {
-		return this.in.get(1);
+	public void addPipedOutputStream(String...keys){
+		for (String key : keys) {
+			if(this.outs.get(key)==null)
+				this.outs.put(key, new PipedOutputStream());
+		}
 	}
 
-	public PipedOutputStream getOut() {
-		return this.out.get(0);
+	public void connectOutputTo(CommonFilter nextFilter, String pipeKey) throws IOException {
+		addPipedOutputStream(pipeKey);
+		nextFilter.addPipedInputStream(pipeKey);
+		this.outs.get(pipeKey).connect(nextFilter.getInputStream(pipeKey));
+	}
+	public void connectInputTo(CommonFilter previousFilter, String pipeKey) throws IOException {
+		addPipedInputStream(pipeKey);
+		previousFilter.addPipedOutputStream(pipeKey);
+		this.ins.get(pipeKey).connect(previousFilter.getOutputStream(pipeKey));
 	}
 
-	public PipedOutputStream getOut2() {
-		return this.out.get(1);
+	@Override
+	public PipedOutputStream getOutputStream(String key) {
+		return outs.get(key);
+	}
+
+	@Override
+	public PipedInputStream getInputStream(String key) {
+		return ins.get(key);
 	}
 
 	abstract public void specificComputationForFilter() throws IOException;
-	// Implementation defined in Runnable interface for thread
+
 	public void run() {
 		try {
 			specificComputationForFilter();
@@ -58,12 +74,11 @@ public abstract class CommonFilterImpl implements CommonFilter {
 		}
 	}
 
+	// TODO
 	private void closePorts() {
 		try {
-			out.get(0).close();
-			out.get(1).close();
-			in.get(0).close();
-			in.get(1).close();
+			for (String s : ins.keySet()) ins.get(s).close();
+			for (String s : outs.keySet()) outs.get(s).close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
